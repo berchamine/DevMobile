@@ -1,0 +1,120 @@
+.list-photo {
+  list-style: none outside;
+  margin: 0;
+  overflow: hidden;
+  margin-left: -30px;
+}
+.list-photo li {
+  float: left;
+  margin: 0 0 30px 30px;
+}
+@media (min-width: 1300px) {
+.list-photo li.last {
+    margin-right: 0;
+  }
+     .img-responsive {
+ display: block;
+ height: auto;
+ max-width: 100%;
+}
+  }
+  
+@media (max-width: 320px) {
+ 
+   .list-photo {
+    margin: 0;
+  }
+  .list-photo li {
+    float: none;
+    margin: 0 0 30px 0;
+  }
+  .list-photo li img {
+    width: 100%;
+  }
+
+  }
+  
+  
+  
+  
+  /*list de player */
+  .play-list {
+  list-style: none outside;
+  margin: 0;
+  overflow: hidden;
+  margin-left: -30px;
+}
+.play-list li {
+  float: left;
+  margin: 0 0 30px 30px;
+}
+
+@media (min-width: 1300px) {
+.play-list li {
+    margin-right: 0;
+  }
+  }
+  
+@media (max-width: 320px) {
+ 
+   .play-list {
+    margin: 0;
+  }
+  .play-list li {
+    float: none;
+    margin: 0 0 30px 0;
+  }
+  .play-list  img {
+    width: 100%;
+  }
+ 
+  }
+  
+  @media (min-width: 320px) {
+
+
+#componentWrapper .playerHolder{
+	position:absolute;
+	top:180px;
+	left:0px;
+	width:510px;
+	height:140px;
+	border-radius: 0px 0px 10px 10px;
+}
+
+#componentWrapper .playlistHolder{
+	position:absolute;
+	top:0px;
+	left:0px;
+	width:510px;
+	height:180px;
+	border-radius: 10px 10px 0px 0px;
+}
+
+}
+
+.carousel {
+    margin-bottom: 0;
+	padding: 0 40px 30px 40px;
+}
+/* Reposition the controls slightly */
+.carousel-control {
+	left: -12px;
+}
+.carousel-control.right {
+	right: -12px;
+}
+/* Changes the position of the indicators */
+.carousel-indicators {
+	right: 50%;
+	top: auto;
+	bottom: 0px;
+	margin-right: -19px;
+}
+/* Changes the colour of the indicators */
+.carousel-indicators li {
+	background: #c0c0c0;
+}
+.carousel-indicators .active {
+background: #333333;
+}

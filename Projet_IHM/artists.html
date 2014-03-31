@@ -1,0 +1,629 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<title>RespZic</title>
+<!-- On ouvre la fenêtre à la largeur de l'écran -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Intégration du CSS Bootstrap -->
+<link href="bootstrap/css/bootstrap.css" rel="stylesheet" media="screen">
+<link href="bootstrap/css/style.css" rel="stylesheet" media="screen">
+<!-- Intégration du CSS responsive Bootstrap -->
+<link href="bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="css/jquery.jscrollpane.css"
+	media="all" />
+
+
+<link rel="stylesheet" href="css/audioplayer.css" />
+
+
+
+<script type="text/javascript" src="js/jquery-1.8.1.min.js"></script>
+<script src="js/audioplayer.js"></script>
+
+<script type="text/javascript" src="js/jquery.cookie.js"></script>
+<script src="bootstrap/js/bootstrap.min.js"></script>
+<script src="backbone001/libs/vendors/underscore.js"></script>
+<script src="backbone001/libs/vendors/backbone.js"></script>
+<script src="backbone001/libs/vendors/backbone.basicauth.js"></script>
+
+
+
+
+<script>
+		
+			
+				function loadSong(elt) {
+				
+				var url=elt.attr('audiourl');
+				
+				document.getElementById("player").src=url;
+				document.getElementById("player").load();
+				document.getElementById("player").play();
+				
+				
+			}
+		   
+			
+			
+					
+			</script>
+
+<script>
+	$(document).ready(function() {
+	    $('#myCarousel').carousel({
+		    interval: 2000
+		});
+		});
+		
+	 jQuery(document).ready(function ($) {
+			
+		$("#modifieprofil").click(function() {
+				$('#profil').modal('hide'); 
+						});
+					
+		$("#logout").click(function() {
+				$.removeCookie("userid");
+				$.removeCookie("username");
+				$.removeCookie("email");
+				$.removeCookie("level");
+				
+						});
+		$('.modifier').click(function(){
+
+		var user_modif = $(".form-modif :input"),
+		   name= $.cookie('username'),
+			mail=$.cookie('email'),
+			userid=$.cookie('userid')
+		 that = this;
+		
+		if(user_modif[0].value==""){
+		user_modif[0].value=name;
+		}
+		if(user_modif[1].value==""){
+		user_modif[1].value=mail;
+		}
+		
+			$.ajax({
+			type:"PUT",
+			url:"http://ihm-api.telecom-st-etienne.fr/users/"+userid,
+			data : {name :user_modif[0].value,email_address :user_modif[1].value} ,
+			beforeSend: function(xhr) { xhr.setRequestHeader("Authorization", "Basic " + btoa(userid + ":" + 'x')); },
+			
+			dataType : 'json',
+			cache:false,
+			error:function (er) {
+			
+			alert("error");
+			
+		
+			},
+			success:function (data) {
+						$.cookie('username',user_modif[0].value);
+						$.cookie('email',user_modif[1].value);
+					
+			alert("Modification reussi");
+				window.location.href="acceuil.html";
+			
+					}
+				
+	});
+	
+	});
+
+	
+	$('.invite').click(function(){
+			
+		var playlist_name = $(".form-invite :input")
+			, that = this;
+	
+			var userid=$.cookie('userid');
+			$.ajax({
+			type:"POST",
+			url:"http://ihm-api.telecom-st-etienne.fr/users/invitation",
+			data : {email_address :playlist_name[0].value} ,
+			beforeSend: function(xhr) { xhr.setRequestHeader("Authorization", "Basic " + btoa(userid + ":" + 'x')); },
+			
+			dataType : 'json',
+			error:function (er) {
+			alert("user deja inscrit ou email non existant");
+			},
+			success:function (data) {
+			
+			alert("Invitation reussi");		
+			
+					}
+				
+	});
+	});
+					
+	        $('#tabs').tab();
+	    });
+	</script>
+
+
+</head>
+<body>
+
+	<style type="text/css">
+.hauteur {
+	height: 170px;
+}
+
+.hauteur2 {
+	height: 100px;
+	width: 100px;
+}
+
+.imga {
+	
+}
+
+.centrer {
+	text-align: center;
+}
+
+.righter {
+	text-align: right;
+}
+
+h3 {
+	color: black;
+	margin: 2px;
+}
+
+.tpp {
+	
+}
+
+.bord1 {
+	width: 285px;
+}
+
+/** Track List **/
+.tracklist {
+	padding: 10px 20px;
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, .15), 0 1px 0
+		rgba(255, 255, 255, .04);
+	-moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .15), 0 1px 0
+		rgba(255, 255, 255, .04);
+	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .15), 0 1px 0
+		rgba(255, 255, 255, .04);
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	color: black;
+	font-size: 12px;
+}
+
+.tracklist ol {
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+
+.tracklist li {
+	text-shadow: 0 1px 1px rgba(0, 0, 0, .6);
+	padding: 10px 0 10px 0;
+	list-style-position: inside;
+	position: relative;
+}
+
+.tracklist li:hover {
+	color: red;
+}
+
+.tracklist .title {
+	width: 270px;
+	display: inline-block;
+	padding: 0 0 0 14px;
+}
+
+.tracklist .legth {
+	width: 120px;
+	display: inline-block;
+	padding: 0 0 0 14px;
+}
+
+body {
+	background-image: url('music.png');
+}
+</style>
+
+
+
+
+	<div id="wrapper">
+
+		<audio id="player" preload="auto" controls>
+
+			<source src="audio/BlueDucks_FourFlossFiveSix.mp3">
+			<source src="audio/BlueDucks_FourFlossFiveSix.ogg">
+			<source src="audio/BlueDucks_FourFlossFiveSix.wav">
+		</audio>
+
+
+		<script>	
+			$( 'audio' ).audioPlayer({
+					classPrefix: 'audioplayer',
+					strPlay: 'Play',
+					strPause: 'Pause',
+					strVolume: 'Volume'
+					});
+			</script>
+
+
+	</div>
+
+
+	<div id="blog_header"></div>
+
+
+	<div class="container">
+		<div class="row">
+			<div class="span10">
+				<div class="page"></div>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/template" id="blog_header_template">
+	  
+	    
+	   <div class="container">
+	   <div><h3>Bienvenue</h3></div>
+	<!-- Barre de navigation -->
+	<div class="navbar">
+	<div class="navbar-inner">
+	<!-- Bouton apparaissant sur les résolutions mobiles afin de faire apparaître le menu de navigation -->
+	<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+	<span class="icon-bar"></span>
+	<span class="icon-bar"></span>
+	<span class="icon-bar"></span>
+	</a>
+	<a class="brand" href="#">RespZic</a>
+	<!-- Structure du menu -->
+	<div class="nav-collapse collapse">
+	<ul class="nav">
+	<li><a href="acceuil.html">Acceuil</a></li>
+	<li class="active"><a href="#">Artistes</a></li>
+	<li><a href="releases.html">Releases</a></li>
+	<li><a href="rechercher.html">Recherche</a></li>
+	</ul>
+
+	<% 	var username=$.cookie('username');
+	%>
+	 <div class="pull-right">
+	                <ul class="nav pull-right">
+	                    <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Welcome, <%=username%> <b class="caret"></b></a>
+	                        <ul class="dropdown-menu">	                            
+	                            <li><a href="#betaModal" data-toggle="modal"><i class="icon-envelope"></i>Invitez vos amis </a></li>
+								<li><a href="#profil" data-toggle="modal"><i class="icon-user"></i>Mon profil</a></li>
+	                            <li class="divider"></li>
+	                            <li><a href="index.html" id="logout" ><i class="icon-off"></i>Logout</a></li>
+	                        </ul>
+	                    </li>
+	                </ul>
+	              </div>
+
+	</div>
+	</div>
+	</div>
+	</div>
+
+	<!-- invitation d'amis !-->
+	<div id="betaModal" class="modal hide fade" style="width:300px;">
+	    <div class="modal-header">
+	            <button class="close" data-dismiss="modal">x</button>
+	            <h3>Invitation</h3>
+	    </div>
+	    <div class="modal-body">
+	        <div class="row-fluid">
+	          
+	                
+	                <div class="span6">
+	                    
+	                
+	                        
+						
+					<div class="form-invite">
+				 
+      
+					<label>Email</label>
+					<span class="add-on"><i class="icon-envelope"></i></span><input size="16" type="email" >
+					
+					<button class="btn btn-info invite" data-dismiss="modal" >Invite</button>
+				   
+				    
+				
+						</div>
+						
+	                        
+	                    
+	                </div>
+	           
+	        </div>
+	    </div>
+	    <div class="modal-footer">
+	        <p><i>Invitation de vos amis</i></p>
+	    </div>
+	</div>
+	<!-- invitation d'amis !-->
+	
+	
+	
+<% 	
+		var usermail=$.cookie('email');
+		var userlevel=$.cookie('level');
+	%>
+
+	<!-- profil !-->
+	<div id="profil" class="modal hide fade">
+	   
+	   <div class="modal-header">
+	            <button class="close" data-dismiss="modal">x</button>
+	    </div>
+	    <div class="modal-body">
+	<div class="container-fluid well ">
+		<div class="row-fluid">
+	       
+	        
+	        <div class="span6">
+	            <h6>Name: <%=username%></h6>
+	            <h6>Email: <%=usermail%></h6>
+	            <h6>Level: <%=userlevel%></h6>
+	            
+	           
+	        </div>
+	        
+	        <div class="span2">
+	            <div class="btn-group">
+	                <a class="btn dropdown-toggle btn-info" data-toggle="dropdown" href="#">
+	                    Action 
+	                    <span class="icon-cog icon-white"></span><span class="caret"></span>
+	                </a>
+	                <ul class="dropdown-menu">
+	                    <li><a id="modifieprofil" href="#modifprofil" data-toggle="modal"><span class="icon-wrench"></span> Modify</a></li>
+	                    <li><a href="#"><span class="icon-trash"></span> Delete</a></li>
+	                </ul>
+	            </div>
+	        </div>
+			</div>
+	</div>
+	</div>
+	</div>
+	<!-- profil !-->
+	
+	 <!-- modifier profil !-->
+	<div id="modifprofil" class="modal hide fade" style="width:300px;">
+
+	
+	    <div class="modal-header">
+	            <button class="close" data-dismiss="modal">x</button>
+	    </div>
+	    <div class="modal-body">
+	        <div class="row-fluid">
+				<div class="form-modif">
+			
+					<label>Name</label>
+					<span class="add-on"><i class="icon-user"></i></span><input size="16" />
+					<label>Email</label>
+					<span class="add-on"><i class="icon-envelope"></i></span><input size="16" type="email"  />
+					
+					<button  class="btn btn-info modifier" data-dismiss="modal" >Modifier</button>
+				
+				</div>  
+
+			</div>
+						
+	                        
+	                    
+	    </div>
+
+	    <div class="modal-footer">
+	        <p><i>Modification de votre profil</i></p>
+	    </div>
+	</div>
+	<!-- modifier profil !-->
+	 </script>
+	<!-- header de la page !-->
+
+
+	<script type="text/template" id="user-list-template">
+<div class="row-fluid">
+
+        <div class="span8">
+ 
+          <h2>Listes des artistes</h2>
+
+		  
+		 
+          <table class="table table-striped table-bordered tab" id="datatable">
+
+            <thead>
+              <tr>
+               <th>Name</th>                 
+               <th>Style</th> 
+			   <th>Releases</th>
+				
+              </tr>
+			</thead>
+             
+
+			 
+           
+      <tbody>
+       <% _.each(users, function(user) { %>
+           <% var artist=user.get("data") ;%>
+		   
+		   <% $.each(artist, function(i,item){
+		   %>
+		   <tr>
+		  <% var img=item.image.square ;%>
+			<td>
+	             
+				
+			 <% var im=_.toArray(img);
+				   var url=im[2]; %>
+	           
+				 <img id="icons" style='float: left; padding-right: 2px; width: 85px; height: 85px;' border='0'src="<%=url%>" >
+			
+			<h3><a href="#"> <%=item.name%></a></h3></td> 
+				  
+			<%var styles=item.styles%>
+			
+			<td>
+            <% $.each(styles, function(j,style){%>
+            
+			<b><p><a href="#"><%=style.name%></a></p></b>
+			<% }); %>
+			</td>
+            
+            <td><a class="btn" href="#/artist/<%= item.id %>">Voir ses Releases</a></td>
+			
+            		
+			</tr>
+			<% }); %>
+       <% }); %>
+      </tbody>
+    </table>
+  </script>
+
+	</div>
+	</div>
+
+
+
+	<script type="text/template" id="result-recherchear">
+  
+    
+          <legend>Ses releases</legend>
+		  <table class="table table-striped table-bordered tab" id="datatable">
+   
+         <tbody>
+		 
+		
+           <% _.each(artist, function(artiste) { %>
+           <% var arti=artiste.get("data") ;%>
+		    <% _.each(arti, function(item){%>
+
+			
+        <% var img=item.image.square ;%>
+			
+	             
+		<tr>
+			 <% var im=_.toArray(img);
+				   var url=im[2]; %>
+	           <td>
+				 <img id="icons" style='float: left; padding-right: 2px; width: 85px; height: 85px;' border='0'src="<%=url%>" >
+			</td>
+		   
+		    <td><h3> <%=item.name%></h3></td>
+		</tr>
+		  <% });
+		   });%>
+		   </tbody>
+		   </table>
+  </script>
+
+
+	<script>
+    var Users = Backbone.Collection.extend({
+      url: 'http://ihm-api.telecom-st-etienne.fr/artists'
+    });
+	
+	var Artists = Backbone.Collection.extend({
+      url: 'http://ihm-api.telecom-st-etienne.fr/artists'
+    });
+	
+    var Releases = Backbone.Collection.extend({
+      url: 'http://ihm-api.telecom-st-etienne.fr/releases'
+    });
+	
+	
+
+     var ArtistReleaseView = Backbone.View.extend({
+      el: '.page',
+	  
+	
+      render: function (options) {
+        var that = this;
+        var artist = new Artists();
+		
+		artist.url = function() {
+		return 'http://ihm-api.telecom-st-etienne.fr/artists/' + options.id + '/releases' ;
+				};
+		artist.credentials = {
+				username: '521ba90dd02ea7311a8b4568',
+				password: 'x'
+										};
+        artist.fetch({
+          success: function (artist) {
+		    
+			
+            var template = _.template($('#result-recherchear').html(), {artist: artist.models});
+            that.$el.html(template);
+          }
+        })
+      }
+    });
+
+
+    var UserListView = Backbone.View.extend({
+      el: '.page',
+      render: function () {
+        var that = this;
+        var users = new Users();
+		var userid=$.cookie('userid');
+			
+			users.credentials = {
+					username: userid,
+					password: 'x'
+											};
+        users.fetch({
+          success: function (users) {
+		    
+			
+            var template = _.template($('#user-list-template').html(), {users: users.models});
+            that.$el.html(template);
+          }
+        })
+      }
+    });
+var HeaderView = Backbone.View.extend({
+			  el: $("#blog_header"),
+			 
+			  
+			  render: function() {
+			  var that = this;
+			  
+			  var template = _.template($("#blog_header_template").html());
+	          that.$el.html(template);
+				
+			  },
+			});
+   var userListView = new UserListView();
+var artistReleaseView=new ArtistReleaseView();
+var headerView=new HeaderView();
+    var Router = Backbone.Router.extend({
+        routes: {
+          "": "home",
+		   "artist/:id":"artist"
+        }
+    });
+
+    var router = new Router;
+    router.on('route:home', function() {
+      headerView.render();
+      userListView.render();
+    });
+   router.on('route:artist', function(id) {
+      headerView.render();
+      artistReleaseView.render({id: id});
+    });
+    Backbone.history.start();
+  </script>
+
+
+</body>
+</html>

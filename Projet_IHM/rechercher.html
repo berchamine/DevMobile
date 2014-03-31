@@ -1,0 +1,946 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<title>RespZic</title>
+<!-- On ouvre la fenêtre à la largeur de l'écran -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Intégration du CSS Bootstrap -->
+<link href="bootstrap/css/bootstrap.css" rel="stylesheet" media="screen">
+<link href="bootstrap/css/style.css" rel="stylesheet" media="screen">
+<!-- Intégration du CSS responsive Bootstrap -->
+<link href="bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="css/jquery.jscrollpane.css"
+	media="all" />
+
+
+<link rel="stylesheet" href="css/audioplayer.css" />
+
+
+
+<script type="text/javascript" src="js/jquery-1.8.1.min.js"></script>
+<script src="js/audioplayer.js"></script>
+
+<script type="text/javascript" src="js/jquery.cookie.js"></script>
+<script src="bootstrap/js/bootstrap.min.js"></script>
+<script src="backbone001/libs/vendors/underscore.js"></script>
+<script src="backbone001/libs/vendors/backbone.js"></script>
+<script src="backbone001/libs/vendors/backbone.basicauth.js"></script>
+
+
+
+<script>
+
+		
+	 jQuery(document).ready(function ($) {
+			
+		$("#modifieprofil").click(function() {
+				$('#profil').modal('hide'); 
+						});
+					
+		$("#logout").click(function() {
+				$.removeCookie("userid");
+				$.removeCookie("username");
+				$.removeCookie("email");
+				$.removeCookie("level");
+				
+						});
+		$('.modifier').click(function(){
+
+		var user_modif = $(".form-modif :input"),
+		   name= $.cookie('username'),
+			mail=$.cookie('email'),
+			userid=$.cookie('userid')
+		 that = this;
+		
+		if(user_modif[0].value==""){
+		user_modif[0].value=name;
+		}
+		if(user_modif[1].value==""){
+		user_modif[1].value=mail;
+		}
+		
+			$.ajax({
+			type:"PUT",
+			url:"http://ihm-api.telecom-st-etienne.fr/users/"+userid,
+			data : {name :user_modif[0].value,email_address :user_modif[1].value} ,
+			beforeSend: function(xhr) { xhr.setRequestHeader("Authorization", "Basic " + btoa(userid + ":" + 'x')); },
+			
+			dataType : 'json',
+			cache:false,
+			error:function (er) {
+			
+			alert("error");
+			
+		
+			},
+			success:function (data) {
+						$.cookie('username',user_modif[0].value);
+						$.cookie('email',user_modif[1].value);
+					
+			alert("Modification reussi");
+				window.location.href="acceuil.html";
+			
+					}
+				
+	});
+	
+	});
+
+	
+	$('.invite').click(function(){
+			
+		var playlist_name = $(".form-invite :input")
+			, that = this;
+	
+			var userid=$.cookie('userid');
+			$.ajax({
+			type:"POST",
+			url:"http://ihm-api.telecom-st-etienne.fr/users/invitation",
+			data : {email_address :playlist_name[0].value} ,
+			beforeSend: function(xhr) { xhr.setRequestHeader("Authorization", "Basic " + btoa(userid + ":" + 'x')); },
+			
+			dataType : 'json',
+			error:function (er) {
+			alert("user deja inscrit ou email non existant");
+			},
+			success:function (data) {
+			
+			alert("Invitation reussi");		
+			
+					}
+				
+	});
+	});
+			
+	    });
+	</script>
+<style type="text/css">
+body {
+	background-image: url('music.png');
+}
+</style>
+
+</head>
+<body>
+
+
+	<style>
+#modif {
+	background: #eeeeee;
+	padding: 10px;
+}
+</style>
+
+
+
+	<script type="text/template" id="blog_header_template">
+	  
+	    
+	   <div class="container">
+	   <div><h1>Bienvenue</h1></div>
+	<!-- Barre de navigation -->
+	<div class="navbar">
+	<div class="navbar-inner">
+	<!-- Bouton apparaissant sur les résolutions mobiles afin de faire apparaître le menu de navigation -->
+	<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+	<span class="icon-bar"></span>
+	<span class="icon-bar"></span>
+	<span class="icon-bar"></span>
+	</a>
+	<a class="brand" href="#">RespZic</a>
+	<!-- Structure du menu -->
+	<div class="nav-collapse collapse">
+	<ul class="nav">
+	<li><a href="acceuil.html">Acceuil</a></li>
+	<li><a href="artists.html">Artistes</a></li>
+	<li><a href="releases.html">Releases</a></li>
+	<li class="active"><a href="#">Recherche</a></li>
+	</ul>
+
+	<% 	var username=$.cookie('username');
+	%>
+	 <div class="pull-right">
+	                <ul class="nav pull-right">
+	                    <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Welcome, <%=username%> <b class="caret"></b></a>
+	                        <ul class="dropdown-menu">	                            
+	                            <li><a href="#betaModal" data-toggle="modal"><i class="icon-envelope"></i>Invitez vos amis </a></li>
+								<li><a href="#profil" data-toggle="modal"><i class="icon-user"></i>Mon profil</a></li>
+	                            <li class="divider"></li>
+	                            <li><a href="index.html" id="logout" ><i class="icon-off"></i>Logout</a></li>
+	                        </ul>
+	                    </li>
+	                </ul>
+	              </div>
+
+	</div>
+	</div>
+	</div>
+	</div>
+
+	<!-- invitation d'amis !-->
+	<div id="betaModal" class="modal hide fade" style="width:300px;">
+	    <div class="modal-header">
+	            <button class="close" data-dismiss="modal">x</button>
+	            <h3>Invitation</h3>
+	    </div>
+	    <div class="modal-body">
+	        <div class="row-fluid">
+	          
+	                
+	                <div class="span6">
+	                    
+	                
+	                        
+						
+					<div class="form-invite">
+				 
+      
+					<label>Email</label>
+					<span class="add-on"><i class="icon-envelope"></i></span><input size="16" type="email" >
+					
+					<button class="btn btn-info invite" data-dismiss="modal" >Invite</button>
+				   
+				    
+				
+						</div>
+						
+	                        
+	                    
+	                </div>
+	           
+	        </div>
+	    </div>
+	    <div class="modal-footer">
+	        <p><i>Invitation de vos amis</i></p>
+	    </div>
+	</div>
+	<!-- invitation d'amis !-->
+	
+	
+	
+<% 	
+		var usermail=$.cookie('email');
+		var userlevel=$.cookie('level');
+	%>
+
+	<!-- profil !-->
+	<div id="profil" class="modal hide fade">
+	   
+	   <div class="modal-header">
+	            <button class="close" data-dismiss="modal">x</button>
+	    </div>
+	    <div class="modal-body">
+	<div class="container-fluid well ">
+		<div class="row-fluid">
+	       
+	        
+	        <div class="span6">
+	            <h6>Name: <%=username%></h6>
+	            <h6>Email: <%=usermail%></h6>
+	            <h6>Level: <%=userlevel%></h6>
+	            
+	           
+	        </div>
+	        
+	        <div class="span2">
+	            <div class="btn-group">
+	                <a class="btn dropdown-toggle btn-info" data-toggle="dropdown" href="#">
+	                    Action 
+	                    <span class="icon-cog icon-white"></span><span class="caret"></span>
+	                </a>
+	                <ul class="dropdown-menu">
+	                    <li><a id="modifieprofil" href="#modifprofil" data-toggle="modal"><span class="icon-wrench"></span> Modify</a></li>
+	                    <li><a href="#"><span class="icon-trash"></span> Delete</a></li>
+	                </ul>
+	            </div>
+	        </div>
+			</div>
+	</div>
+	</div>
+	</div>
+	<!-- profil !-->
+	
+	 <!-- modifier profil !-->
+	<div id="modifprofil" class="modal hide fade" style="width:300px;">
+
+	
+	    <div class="modal-header">
+	            <button class="close" data-dismiss="modal">x</button>
+	    </div>
+	    <div class="modal-body">
+	        <div class="row-fluid">
+				<div class="form-modif">
+			
+					<label>Name</label>
+					<span class="add-on"><i class="icon-user"></i></span><input size="16" />
+					<label>Email</label>
+					<span class="add-on"><i class="icon-envelope"></i></span><input size="16" type="email"  />
+					
+					<button  class="btn btn-info modifier" data-dismiss="modal" >Modifier</button>
+				
+				</div>  
+
+			</div>
+						
+	                        
+	                    
+	    </div>
+
+	    <div class="modal-footer">
+	        <p><i>Modification de votre profil</i></p>
+	    </div>
+	</div>
+	<!-- modifier profil !-->
+	 </script>
+	<!-- header de la page !-->
+
+	<div id="blog_header"></div>
+
+
+
+	<div class="container">
+		<div class="row-fluid">
+			<div class="span6">
+				<div class="page"></div>
+				<div class="pageee"></div>
+			</div>
+
+			<div class="span6">
+				<div class="pagee"></div>
+			</div>
+		</div>
+	</div>
+
+	</div>
+
+	<script type="text/javascript">
+
+	
+
+
+	var Artists = Backbone.Collection.extend({
+      url: 'http://ihm-api.telecom-st-etienne.fr/artists'
+    });
+	
+	var Releases = Backbone.Collection.extend({
+      url: 'http://ihm-api.telecom-st-etienne.fr/releases'
+    });
+	
+	
+
+     var ArtistReleaseView = Backbone.View.extend({
+      el: '.pageee',
+	  
+	
+      render: function (options) {
+        var that = this;
+        var artist = new Artists();
+		
+		artist.url = function() {
+		return 'http://ihm-api.telecom-st-etienne.fr/artists/' + options.id + '/releases' ;
+				};
+		artist.credentials = {
+				username: '521ba90dd02ea7311a8b4568',
+				password: 'x'
+										};
+        artist.fetch({
+          success: function (artist) {
+		    
+			
+            var template = _.template($('#result-recherchear').html(), {artist: artist.models});
+            that.$el.html(template);
+          }
+        })
+      }
+    });
+
+    var RechercheView = Backbone.View.extend({
+      el: '.page',
+	  
+	
+      render: function () {
+	  
+        var that = this;
+		var artists = new Artists();
+		artists.credentials = {
+				username: '521ba90dd02ea7311a8b4568',
+				password: 'x'
+										};
+        artists.fetch({
+          success: function () {
+		    
+        
+            var template = _.template($('#recherche').html());
+            that.$el.html(template);
+          }
+        })
+      }
+    });
+
+   
+   
+   
+   var ResulRecheraView = Backbone.View.extend({
+      el: '.page',
+	  
+	
+      render: function () {
+        var that = this;
+        var artists = new Artists();
+		artists.credentials = {
+				username: '521ba90dd02ea7311a8b4568',
+				password: 'x'
+										};
+        artists.fetch({
+          success: function (artists) {
+		    
+			
+            var template = _.template($('#result-recherchea').html(), {artists: artists.models});
+            that.$el.html(template);
+          }
+        })
+      }
+    });
+	
+	
+	var ResulRechersView = Backbone.View.extend({
+      el: '.page',
+	  
+	
+      render: function () {
+        var that = this;
+        var releases = new Releases();
+		releases.credentials = {
+				username: '521ba90dd02ea7311a8b4568',
+				password: 'x'
+										};
+        releases.fetch({
+          success: function (releases) {
+		    
+			
+            var template = _.template($('#result-recherches').html(), {releases: releases.models});
+            that.$el.html(template);
+          }
+        })
+      }
+    });
+	
+	
+	var ResulRecheroView = Backbone.View.extend({
+      el: '.page',
+	  
+	
+      render: function () {
+        var that = this;
+        var releases = new Releases();
+		releases.credentials = {
+				username: '521ba90dd02ea7311a8b4568',
+				password: 'x'
+										};
+        releases.fetch({
+          success: function (releases) {
+		    
+			
+            var template = _.template($('#result-rechercheo').html(), {releases: releases.models});
+            that.$el.html(template);
+          }
+        })
+      }
+    });
+	
+	
+   var ModifView = Backbone.View.extend({
+      el: '.pagee',
+	  
+	
+      render: function () {
+	  
+        var that = this;
+		var artists = new Artists();
+		artists.credentials = {
+				username: '521ba90dd02ea7311a8b4568',
+				password: 'x'
+										};
+        artists.fetch({
+          success: function () {
+		    
+        
+            var template = _.template($('#recherche').html());
+            that.$el.html(template);
+          }
+        })
+      }
+    });
+   
+   var HeaderView = Backbone.View.extend({
+			  el: $("#blog_header"),
+			 
+			  
+			  render: function() {
+			  var that = this;
+			  
+			  var template = _.template($("#blog_header_template").html());
+	          that.$el.html(template);
+				
+			  },
+			});
+			
+			
+    var Router = Backbone.Router.extend({
+        routes: {
+          "": "recherche",
+		  "resulrecha":"resulRechera",
+		  "resulrechs":"resulRechers",
+		  "resulrecho":"resulRechero",
+		  "modifrech":"modifRecher",
+		  "artist/:id":"artist"
+        }
+    });
+	
+	var headerView=new HeaderView();
+	var artistReleaseView=new ArtistReleaseView();
+	var rechercheView = new RechercheView();
+	var resulRecheraView=new ResulRecheraView();
+	var resulRechersView=new ResulRechersView();
+	var resulRecheroView=new ResulRecheroView();
+	var modifRecherView= new ModifView();
+	
+    var router = new Router;
+	
+	 router.on('route:artist', function(id) {
+	 headerView.render();
+      artistReleaseView.render({id: id});
+    })
+	
+    router.on('route:recherche', function() {
+      headerView.render();
+      rechercheView.render();
+    });
+	
+	 router.on('route:resulRechera', function() {
+      headerView.render();
+      resulRecheraView.render();
+    });
+
+	router.on('route:resulRechers', function() {
+      headerView.render();
+      resulRechersView.render();
+    });
+	
+	router.on('route:resulRechero', function() {
+      headerView.render();
+      resulRecheroView.render();
+    });
+	
+	 router.on('route:modifRecher', function() {
+      headerView.render();
+      modifRecherView.render();
+    });
+  
+    Backbone.history.start();
+	
+	
+	
+
+</script>
+
+
+	<script type="text/template" id="recherche">
+ 
+ 
+ 
+  
+  <div class="container">
+   <div class="row-fluid">
+
+        <div class="span6">
+  
+   <div class="control-group">
+      <legend>Recherche par Nom d'Artiste</legend>
+      <label class="control-label"  for="artiste">Nom d'artiste</label>
+      <div class="controls">
+        <input type="text" id="artist" name="artiste" placeholder="" class="input-xlarge">
+		<a class="btn btn-success" href="#/resulrecha"><i class="icon-search icon-white" ></i></a>
+     
+      </div>
+    </div>
+	
+	
+	
+	
+	<div class="control-group">
+      <legend>Recherche par Style</legend>
+      <label class="control-label"  for="style">Style</label>
+      <div class="controls">
+        <input type="text" id="styl" name="style" placeholder="" class="input-xlarge">
+		<a class="btn btn-success" href="#/resulrechs"><i class="icon-search icon-white" ></i></a>
+     
+      </div>
+    </div>
+	
+	
+       
+	
+	<div class="control-group">
+      <legend>Recherche par Nom d Oeuvre</legend>
+      <label class="control-label"  for="oeuvre">Oeuvre</label>
+      <div class="controls">
+        <input type="text" id="oeuvr" name="oeuvre" placeholder="" class="input-xlarge">
+		<a class="btn btn-success" href="#/resulrecho"><i class="icon-search icon-white" ></i></a>
+     
+      </div>
+    </div>
+	
+
+	
+	
+	 </div>
+    </div>
+	</div>
+	
+
+</script>
+
+
+	<script type="text/template" id="result-recherchea">
+  
+   
+   <div class="container">
+   <div class="row-fluid">
+
+        <div class="span6">
+ 
+          
+        
+		<% var search=$("#artist").val();
+		   var trouve=0;
+		%>
+			<% _.each(artists, function(artiste) { %>
+           <% var artist=artiste.get("data") ;%>
+
+		   <% _.each(artist, function(item){
+		   if(item.name==search){
+		   
+		   trouve=1;
+		   %>
+		 
+		<legend>Resultat de la recherche</legend>
+		 
+          <table class="table table-striped table-bordered tab" id="datatable">
+   
+      <thead>
+           <tr>
+               <th>Name</th>                 
+               <th>Styles</th>
+               <th>Releases</th>			   
+				
+              </tr>
+      </thead>
+         <tbody>
+		    <tr>
+		  <% var img=item.image.square ;%>
+			<td>
+	             
+				
+			 <% var im=_.toArray(img);
+				   var url=im[2]; %>
+	           
+				 <img id="icons" style='float: left; padding-right: 2px; width: 85px; height: 85px;' border='0'src="<%=url%>" >
+			
+			<h3><a href="#/resulrecha"> <%=item.name%></a></h3></td> 
+				  
+			<%var styles=item.styles%>
+			
+			<td>
+            <% $.each(styles, function(j,style){%>
+            
+			<b><p><a href="#/resulrecha"><%=style.name%></a></p></b>
+			<% }); %>
+			</td>
+            
+           <td><a class="btn" href="#/artist/<%= item.id %>">Voir ses Releases</a></td>
+			
+            		
+			</tr>
+	
+			<% } %> 
+			
+			<% }); %>
+			</tbody>
+			</table>
+			
+			
+				<% }); 
+				if(trouve==0){
+			%>
+			<div><h5>Il n'existe pas d'artiste avec ce nom (NB:le nom d'artiste commence par une majuscule)</h5></div>
+			<% } %>
+    
+		
+      
+	<div class="control-group">
+      <!-- Button -->
+      <div class="controls">
+        <a class="btn btn-success" href="#/modifrech"><i class="icon-search icon-white" ></i>Modifier ma Recherche</a>
+      </div>
+    </div>
+	
+	</div>
+	
+	
+	</div>
+	
+	</div>
+	</div>
+  </script>
+
+
+
+
+	<script type="text/template" id="result-recherches">
+  
+   
+   <div class="container">
+   <div class="row-fluid">
+
+        <div class="span6">
+ 
+         <legend>Resultat de la recherche</legend>
+		 
+          <table class="table table-striped table-bordered tab" id="datatable">
+   
+      <thead>
+           <tr>
+                              
+               <th>Styles</th>
+               <th>Releases</th>			   
+				
+              </tr>
+      </thead> 
+        <tbody>
+		    
+		<% var search=$("#styl").val();
+		
+		   var trouve=0;
+		%>
+			<% _.each(releases, function(release) { 
+           var releas=release.get("data") ;%>
+
+		   <% _.each(releas, function(item){
+		   
+		   var styles=item.styles;
+		   _.each(styles, function(style){
+		   if(style.name==search){
+		   
+		   trouve=1;
+		   %>
+		 
+		
+         
+		  <% var img=item.image.square ;%>
+		  <tr>
+		  
+		  <td><%=search%></td>
+			<td>
+	             
+				
+			 <% var im=_.toArray(img);
+				   var url=im[2]; %>
+	           
+				 <img id="icons" style='float: left; padding-right: 2px; width: 85px; height: 85px;' border='0'src="<%=url%>" >
+			
+			<h3><a href="#/resulrecha"> <%=item.name%></a></h3>
+			</td> 
+			
+            		
+			</tr>
+	
+			<% } %> 
+			
+			<% }); %>
+			
+				<% }); %>
+				<% }); %>
+				
+				<%
+			if(trouve==0){
+			%>
+			<div><h3>Il n'existe pas de style avec ce nom (NB:le nom du style commence par majuscule)</h3></div>
+			<% } %>
+				
+				</tbody>
+			</table>
+    
+		
+      
+	<div class="control-group">
+      <!-- Button -->
+      <div class="controls">
+        <a class="btn btn-success" href="#/modifrech"><i class="icon-search icon-white" ></i>Modifier ma Recherche</a>
+      </div>
+    </div>
+	
+	</div>
+	
+	
+	</div>
+	
+	</div>
+	</div>
+  </script>
+
+
+
+
+	<script type="text/template" id="result-rechercheo">
+  
+   
+   <div class="container">
+   <div class="row-fluid">
+
+        <div class="span6">
+ 
+         <legend>Resultat de la recherche</legend>
+		 
+          <table class="table table-striped table-bordered tab" id="datatable">
+   
+      <thead>
+           <tr>
+                              
+               <th>Realease</th>
+               <th>Artist</th>
+               <th>Style</th>			   
+				
+              </tr>
+      </thead> 
+        <tbody>
+		    
+		<% var search=$("#oeuvr").val();
+		
+		   var trouve=0;
+		%>
+			<% _.each(releases, function(release) { 
+           var releas=release.get("data") ;%>
+
+		   <% _.each(releas, function(item){
+		   
+		   
+		   if(item.name==search){
+		   
+		   trouve=1;
+		   %>
+		 
+		
+         
+		  <% var img=item.image.square ;%>
+		  <tr>
+		  
+		 
+			<td>
+	             
+				
+			 <% var im=_.toArray(img);
+				   var url=im[2]; %>
+	           
+				 <img id="icons" style='float: left; padding-right: 2px; width: 85px; height: 85px;' border='0'src="<%=url%>" >
+			
+			<h3><%=search%></h3>
+			</td> 
+			
+		   
+		   <td>
+		   <% var artists=item.artists;
+		   _.each(artists, function(artist){%>
+		   
+		   <h3><%=artist.name%></h3>
+		   <% }); %>
+		   </td>
+		   
+		   <td>
+		   <% var styles=item.styles;
+		   _.each(styles, function(style){%>
+		   
+		   <h3><%=style.name%></h3>
+		   <% }); %>
+		   </td>
+		   
+		   
+            	
+			</tr>
+	
+			<% } %> 
+			
+			<% }); %>
+			
+				<% }); %>
+				
+				
+				<%
+			if(trouve==0){
+			%>
+			<div><h3>Il n'existe pas de release avec ce nom( NB:le nom de release commence par une majuscule)</h3></div>
+			<% } %>
+				
+				</tbody>
+			</table>
+    
+		
+      
+	<div class="control-group">
+      <!-- Button -->
+      <div class="controls">
+        <a class="btn btn-success" href="#/modifrech"><i class="icon-search icon-white" ></i>Modifier ma Recherche</a>
+      </div>
+    </div>
+	
+	</div>
+	
+	
+	</div>
+	
+	</div>
+	</div>
+  </script>
+
+
+
+	<script type="text/template" id="result-recherchear">
+  
+    
+          <legend>Ses releases</legend>
+		  <table class="table table-striped table-bordered tab" id="datatable">
+   
+         <tbody>
+		 
+		
+           <% _.each(artist, function(artiste) { %>
+           <% var arti=artiste.get("data") ;%>
+		    <% _.each(arti, function(item){%>
+
+			
+        <% var img=item.image.square ;%>
+			
+	             
+		<tr>
+			 <% var im=_.toArray(img);
+				   var url=im[2]; %>
+	           <td>
+				 <img id="icons" style='float: left; padding-right: 2px; width: 85px; height: 85px;' border='0'src="<%=url%>" >
+			</td>
+		   
+		    <td><h3> <%=item.name%></h3></td>
+		</tr>
+		  <% });
+		   });%>
+		   </tbody>
+		   </table>
+  </script>
+
+
+
+
+
+
+</body>
+</html>

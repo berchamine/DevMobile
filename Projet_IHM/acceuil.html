@@ -1,0 +1,1562 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<title>RespZic</title>
+<!-- On ouvre la fenêtre à la largeur de l'écran -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Intégration du CSS Bootstrap -->
+<link href="bootstrap/css/bootstrap.css" rel="stylesheet" media="screen">
+<link href="bootstrap/css/style.css" rel="stylesheet" media="screen">
+<!-- Intégration du CSS responsive Bootstrap -->
+<link href="bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="css/jquery.jscrollpane.css"
+	media="all" />
+
+
+<link rel="stylesheet" href="css/audioplayer.css" />
+
+
+
+<script type="text/javascript" src="js/jquery-1.8.1.min.js"></script>
+<script src="js/audioplayer.js"></script>
+
+<script type="text/javascript" src="js/jquery.cookie.js"></script>
+<script src="bootstrap/js/bootstrap.min.js"></script>
+<script src="backbone001/libs/vendors/underscore.js"></script>
+<script src="backbone001/libs/vendors/backbone.js"></script>
+<script src="backbone001/libs/vendors/backbone.basicauth.js"></script>
+
+
+
+
+<script>
+		
+			
+				function loadSong(elt) {
+				
+				var url=elt.attr('audiourl');
+				
+				document.getElementById("player").src=url;
+				document.getElementById("player").load();
+				document.getElementById("player").play();
+				
+				
+			}
+		   
+			
+			
+					
+			</script>
+
+<script>
+	$(document).ready(function() {
+	    $('#myCarousel').carousel({
+		    interval: 2000
+		});
+		});
+		
+	 jQuery(document).ready(function ($) {
+			
+		$("#modifieprofil").click(function() {
+				$('#profil').modal('hide'); 
+						});
+					
+		$("#logout").click(function() {
+				$.removeCookie("userid");
+				$.removeCookie("username");
+				$.removeCookie("email");
+				$.removeCookie("level");
+				
+						});
+		$('.modifier').click(function(){
+
+		var user_modif = $(".form-modif :input"),
+		   name= $.cookie('username'),
+			mail=$.cookie('email'),
+			userid=$.cookie('userid')
+		 that = this;
+		
+		if(user_modif[0].value==""){
+		user_modif[0].value=name;
+		}
+		if(user_modif[1].value==""){
+		user_modif[1].value=mail;
+		}
+		
+			$.ajax({
+			type:"PUT",
+			url:"http://ihm-api.telecom-st-etienne.fr/users/"+userid,
+			data : {name :user_modif[0].value,email_address :user_modif[1].value} ,
+			beforeSend: function(xhr) { xhr.setRequestHeader("Authorization", "Basic " + btoa(userid + ":" + 'x')); },
+			
+			dataType : 'json',
+			cache:false,
+			error:function (er) {
+			
+			alert("error");
+			
+		
+			},
+			success:function (data) {
+						$.cookie('username',user_modif[0].value);
+						$.cookie('email',user_modif[1].value);
+					
+			alert("Modification reussi");
+				window.location.href="acceuil.html";
+			
+					}
+				
+	});
+	
+	});
+
+	
+	$('.invite').click(function(){
+			
+		var playlist_name = $(".form-invite :input")
+			, that = this;
+	
+			var userid=$.cookie('userid');
+			$.ajax({
+			type:"POST",
+			url:"http://ihm-api.telecom-st-etienne.fr/users/invitation",
+			data : {email_address :playlist_name[0].value} ,
+			beforeSend: function(xhr) { xhr.setRequestHeader("Authorization", "Basic " + btoa(userid + ":" + 'x')); },
+			
+			dataType : 'json',
+			error:function (er) {
+			alert("user deja inscrit ou email non existant");
+			},
+			success:function (data) {
+			
+			alert("Invitation reussi");		
+			
+					}
+				
+	});
+	});
+					
+	        $('#tabs').tab();
+	    });
+	</script>
+
+
+</head>
+<body>
+
+	<style type="text/css">
+.hauteur {
+	height: 170px;
+}
+
+.hauteur2 {
+	height: 100px;
+	width: 100px;
+}
+
+.imga {
+	
+}
+
+.centrer {
+	text-align: center;
+}
+
+.righter {
+	text-align: right;
+}
+
+h3 {
+	color: black;
+	margin: 2px;
+}
+
+.tpp {
+	
+}
+
+.bord1 {
+	width: 285px;
+}
+
+/** Track List **/
+.tracklist {
+	padding: 10px 20px;
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, .15), 0 1px 0
+		rgba(255, 255, 255, .04);
+	-moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .15), 0 1px 0
+		rgba(255, 255, 255, .04);
+	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .15), 0 1px 0
+		rgba(255, 255, 255, .04);
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	color: black;
+	font-size: 12px;
+}
+
+.tracklist ol {
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+
+.tracklist li {
+	text-shadow: 0 1px 1px rgba(0, 0, 0, .6);
+	padding: 10px 0 10px 0;
+	list-style-position: inside;
+	position: relative;
+}
+
+.tracklist li:hover {
+	color: red;
+}
+
+.tracklist .title {
+	width: 270px;
+	display: inline-block;
+	padding: 0 0 0 14px;
+}
+
+.tracklist .legth {
+	width: 120px;
+	display: inline-block;
+	padding: 0 0 0 14px;
+}
+
+body {
+	background-image: url('music.png');
+}
+</style>
+
+
+
+
+	<div id="wrapper">
+
+		<audio id="player" preload="auto" controls>
+
+			<source src="audio/BlueDucks_FourFlossFiveSix.mp3">
+			<source src="audio/BlueDucks_FourFlossFiveSix.ogg">
+			<source src="audio/BlueDucks_FourFlossFiveSix.wav">
+		</audio>
+
+
+		<script>	
+			$( 'audio' ).audioPlayer({
+					classPrefix: 'audioplayer',
+					strPlay: 'Play',
+					strPause: 'Pause',
+					strVolume: 'Volume'
+					});
+			</script>
+
+
+	</div>
+
+
+	<div id="blog_header"></div>
+
+
+	<div class="container">
+		<div class="row">
+			<div class="span12">
+				<div class="bodyy">
+
+
+					<div class="container">
+						<div class="row">
+							<div class="span12">
+								<h3>Dernieres sorties</h3>
+								<div class="releases"></div>
+							</div>
+						</div>
+					</div>
+
+
+
+					<div class="container">
+						<div class="row">
+
+							<article class="span6">
+
+								<h3>Mes playlists</h3>
+								<div id="blog_playlist"></div>
+							</article>
+
+							<aside class="span6">
+								<h3>Mes favoris</h3>
+								<div id="blog_favoris"></div>
+							</aside>
+
+
+
+
+
+						</div>
+					</div>
+
+				</div>
+
+
+
+
+			</div>
+		</div>
+	</div>
+
+
+
+
+
+
+
+
+	<!-- header de la page !-->
+	<script type="text/template" id="blog_header_template">
+	  
+	    
+	   <div class="container">
+	   <div><h3>Bienvenue</h3></div>
+	<!-- Barre de navigation -->
+	<div class="navbar">
+	<div class="navbar-inner">
+	<!-- Bouton apparaissant sur les résolutions mobiles afin de faire apparaître le menu de navigation -->
+	<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+	<span class="icon-bar"></span>
+	<span class="icon-bar"></span>
+	<span class="icon-bar"></span>
+	</a>
+	<a class="brand" href="#">RespZic</a>
+	<!-- Structure du menu -->
+	<div class="nav-collapse collapse">
+	<ul class="nav">
+	<li class="active"><a href="#">Acceuil</a></li>
+	<li><a href="artists.html">Artistes</a></li>
+	<li><a href="releases.html">Releases</a></li>
+	<li><a href="rechercher.html">Recherche</a></li>
+	</ul>
+
+	<% 	var username=$.cookie('username');
+	%>
+	 <div class="pull-right">
+	                <ul class="nav pull-right">
+	                    <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Welcome, <%=username%> <b class="caret"></b></a>
+	                        <ul class="dropdown-menu">	                            
+	                            <li><a href="#betaModal" data-toggle="modal"><i class="icon-envelope"></i>Invitez vos amis </a></li>
+								<li><a href="#profil" data-toggle="modal"><i class="icon-user"></i>Mon profil</a></li>
+	                            <li class="divider"></li>
+	                            <li><a href="index.html" id="logout" ><i class="icon-off"></i>Logout</a></li>
+	                        </ul>
+	                    </li>
+	                </ul>
+	              </div>
+
+	</div>
+	</div>
+	</div>
+	</div>
+
+	<!-- invitation d'amis !-->
+	<div id="betaModal" class="modal hide fade" style="width:300px;">
+	    <div class="modal-header">
+	            <button class="close" data-dismiss="modal">x</button>
+	            <h3>Invitation</h3>
+	    </div>
+	    <div class="modal-body">
+	        <div class="row-fluid">
+	          
+	                
+	                <div class="span6">
+	                    
+	                
+	                        
+						
+					<div class="form-invite">
+				 
+      
+					<label>Email</label>
+					<span class="add-on"><i class="icon-envelope"></i></span><input size="16" type="email" >
+					
+					<button class="btn btn-info invite" data-dismiss="modal" >Invite</button>
+				   
+				    
+				
+						</div>
+						
+	                        
+	                    
+	                </div>
+	           
+	        </div>
+	    </div>
+	    <div class="modal-footer">
+	        <p><i>Invitation de vos amis</i></p>
+	    </div>
+	</div>
+	<!-- invitation d'amis !-->
+	
+	
+	
+<% 	
+		var usermail=$.cookie('email');
+		var userlevel=$.cookie('level');
+	%>
+
+	<!-- profil !-->
+	<div id="profil" class="modal hide fade">
+	   
+	   <div class="modal-header">
+	            <button class="close" data-dismiss="modal">x</button>
+	    </div>
+	    <div class="modal-body">
+	<div class="container-fluid well ">
+		<div class="row-fluid">
+	       
+	        
+	        <div class="span6">
+	            <h6>Name: <%=username%></h6>
+	            <h6>Email: <%=usermail%></h6>
+	            <h6>Level: <%=userlevel%></h6>
+	            
+	           
+	        </div>
+	        
+	        <div class="span2">
+	            <div class="btn-group">
+	                <a class="btn dropdown-toggle btn-info" data-toggle="dropdown" href="#">
+	                    Action 
+	                    <span class="icon-cog icon-white"></span><span class="caret"></span>
+	                </a>
+	                <ul class="dropdown-menu">
+	                    <li><a id="modifieprofil" href="#modifprofil" data-toggle="modal"><span class="icon-wrench"></span> Modify</a></li>
+	                    <li><a href="#"><span class="icon-trash"></span> Delete</a></li>
+	                </ul>
+	            </div>
+	        </div>
+			</div>
+	</div>
+	</div>
+	</div>
+	<!-- profil !-->
+	
+	 <!-- modifier profil !-->
+	<div id="modifprofil" class="modal hide fade" style="width:300px;">
+
+	
+	    <div class="modal-header">
+	            <button class="close" data-dismiss="modal">x</button>
+	    </div>
+	    <div class="modal-body">
+	        <div class="row-fluid">
+				<div class="form-modif">
+			
+					<label>Name</label>
+					<span class="add-on"><i class="icon-user"></i></span><input size="16" />
+					<label>Email</label>
+					<span class="add-on"><i class="icon-envelope"></i></span><input size="16" type="email"  />
+					
+					<button  class="btn btn-info modifier" data-dismiss="modal" >Modifier</button>
+				
+				</div>  
+
+			</div>
+						
+	                        
+	                    
+	    </div>
+
+	    <div class="modal-footer">
+	        <p><i>Modification de votre profil</i></p>
+	    </div>
+	</div>
+	<!-- modifier profil !-->
+	 </script>
+	<!-- header de la page !-->
+
+
+	<!-- liste des playlists !-->
+	<script type="text/template" id="blog_playlist_template">
+	 
+		
+			       
+				
+				
+		<table class="table table-striped table-bordered tab" id="datatable">
+
+            <thead>
+              <tr>
+               <th>Playlist Name</th>                 
+               <th>Created At</th> 
+			   <th>Delete</th>
+              </tr>
+			</thead>
+             
+
+			
+           
+			<tbody>
+        <% _.each(playlists, function(playliste) { 
+	           var playlist=playliste.get("data") ;%>
+		   
+		   <% $.each(playlist, function(i,item){
+		   %>
+		   <tr>
+		  <% var name=item.name ;
+		     var create_at=item.created_at;
+			 %>
+			<td>
+	             
+				
+			 
+			
+			<h4><a href="#/playlist/<%=item.id%>"> <%=name%></a></h4></td> 
+				  
+			
+			
+			<td>
+           
+            
+			<h5><%=create_at%></h5>
+			</td>
+			<td>
+			<div class="playlist-remove" style="text-align:right;" >
+            <button class="btn btn-danger" name="<%=item.id%>"><i class="icon-remove " ></i></button>
+			</div>
+			</td>
+            
+           
+			
+            		
+			</tr>
+			<% }); %>
+       <% }); %>
+      </tbody>
+    </table>
+				
+			<div class="create-playlist-form">
+				 
+      
+					<label>Nom du playliste</label>
+					<input name="firstname" type="text" >
+					
+					<button class="btn btn-info">Create New Playlist</button>
+				   
+				
+				
+			</div>
+	      
+	
+	 
+	 </script>
+	<!-- liste des playlists!-->
+
+
+	<!-- liste des favoris!-->
+	<script type="text/template" id="favorite-list-template">
+
+       
+
+		  
+		 
+          <table class="table table-striped table-bordered tab" id="datatable">
+
+            <thead>
+              <tr>
+               <th>Album</th>                 
+                               
+				
+              </tr>
+			</thead>
+             
+
+			 
+           
+      <tbody>
+       <% _.each(favorites, function(favorite) { %>
+           <% var album=favorite.get("data") ;%>
+		   
+		   <% $.each(album, function(i,item){
+		   %>
+		   <tr>
+		  <% var img=item.image.square ;%>
+			<td>
+	             
+				
+			 <% var im=_.toArray(img);
+				   var url=im[2]; %>
+	           
+				 <img id="icons" style='float: left; padding-right: 2px; width: 85px; height: 85px;' border='0'src="<%=url%>" >
+			
+			<h3><a href="#/releases/<%= item.id %>"> <%=item.name%></a></h3>
+				  
+			
+			
+			<div style="text-align:right;" >
+            <a class="btn btn-danger" href="#/delete/<%= item.id %>" ><i class="icon-remove" ></i></a>
+			</div>
+            
+			</td> 
+			
+            		
+			</tr>
+			<% }); %>
+       <% }); %>
+      </tbody>
+    </table>
+  </script>
+	<!-- liste des favoris!-->
+
+	<!-- derniers sorties!-->
+	<script type="text/template" id="releases">
+	
+
+
+					<!-- slider!-->
+	
+			  
+	    	    <div class="well"> 
+	               <div class="releases"> 
+				   
+	                 
+	               <div id="myCarousel" class="carousel slide">
+	                 
+	                <ol class="carousel-indicators">
+	                    <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+	                    <li data-target="#myCarousel" data-slide-to="1"></li>
+	                
+	                </ol>
+	            <% var i=0; 
+				  var url= new Array();
+				  var id=new Array();
+				  %>
+			
+				<% _.each(releases, function(release) { 
+	           var releas=release.get("data") ;%>
+
+			   <% _.each(releas, function(item){
+			   
+			   %>
+			 
+			
+	         
+			  <% var img=item.image.square ;%>
+			
+		             
+					
+				 <% var im=_.toArray(img);
+				    
+					if(i<45){
+					    url[i]=im[2];
+						id[i]=item.id;
+						
+						i++;
+						} %>
+						
+						<% }); %>
+						<% }); %>
+						<!-- Conteneur principal -->
+
+					   <div class="carousel-inner">
+	                    
+	                <div class="item active">
+	                	<div class="row-fluid">
+	                	  <div class="span3"><a href="#/releases/<%= id[3] %>" class="thumbnail"><img src="<%=url[3]%>" class="hauteur" alt="Image" style="max-width:100%;" /></a></div>
+	                	  <div class="span3"><a href="#/releases/<%= id[4] %>" class="thumbnail"><img src="<%=url[4]%>" class="hauteur" alt="Image" style="max-width:100%;" /></a></div>
+	                	  <div class="span3"><a href="#/releases/<%= id[5] %>" class="thumbnail"><img src="<%=url[5]%>" class="hauteur" alt="Image" style="max-width:100%;" /></a></div>
+	                	  <div class="span3"><a href="#/releases/<%= id[6] %>" class="thumbnail"><img src="<%=url[6]%>" class="hauteur" alt="Image" style="max-width:100%;" /></a></div>
+	                	</div>
+	                </div>
+	                 
+	                <div class="item">
+	                	<div class="row-fluid">
+	                		<div class="span3"><a href="#/releases/<%= id[7] %>" class="thumbnail"><img src="<%=url[7]%>" class="hauteur" alt="Image" style="max-width:100%;" /></a></div>
+	                		<div class="span3"><a href="#/releases/<%= id[8] %>" class="thumbnail"><img src="<%=url[8]%>" class="hauteur" alt="Image" style="max-width:100%;" /></a></div>
+	                		<div class="span3"><a href="#/releases/<%= id[9] %>" class="thumbnail"><img src="<%=url[9]%>" class="hauteur" alt="Image" style="max-width:100%;" /></a></div>
+	                		<div class="span3"><a href="#/releases/<%= id[10] %>" class="thumbnail"><img src="<%=url[10]%>" class="hauteur" alt="Image" style="max-width:100%;" /></a></div>
+	                	</div>
+	                </div>
+	                 
+	                
+	                 
+	                </div>
+					<a class="left carousel-control" href="#myCarousel" data-slide="prev">&lsaquo;</a>
+	                <a class="right carousel-control" href="#myCarousel" data-slide="next">&rsaquo;	</a>
+	                </div>
+
+	            </div> 
+	            </div>			
+		
+				
+	  </script>
+	<!-- derniers sorties !-->
+
+
+	<!--add track to playlist!-->
+
+	<script type="text/template" id="blog_addtrack_template">
+	  
+	  
+        <% 
+		
+		_.each(playlists, function(playliste) { 
+	           var playlist=playliste.get("data") ;%>
+		     
+	   	<legend for="tracks">Dans quelle playlist vous voulez ajouter ?</legend> 
+       <br />
+       <select name="tracks" id="tracks">
+           
+       
+  
+		   <% $.each(playlist, function(i,item){
+		   %>
+		   
+		  <% var name=item.name ;
+		     var id=item.id;
+			 %>
+			
+	         <option value="<%=id%>"><%=name%></option>  
+					
+			
+             			 
+				
+			 
+			
+			<% }); %>
+			</select>
+			
+       <% }); %>
+				
+				<button class="btn btn-success" >Add to playlist</button>
+	      
+	  
+	  </script>
+
+	<!--add track to playlist!-->
+
+
+
+	<!--playlist description!-->
+
+	<script type="text/template" id="desc_playlist_template">
+
+	<div class="container">
+	   <div class="row-fluid">
+
+	       
+			
+			<div class="span6">
+	 
+			<%
+			
+			
+			var tracklist=playlist.get("tracks");
+			var playlistname=playlist.get("name");
+			var playlistcreate=playlist.get("created_at");
+			var id_playlist=playlist.get("id");
+		
+			
+			var track_length;
+			var track_source;
+			var track_name;
+			var track_id;
+			var track_artist;
+			var track_release;
+			var track_image;
+			var i=0;
+			  
+			%>
+				
+	        
+			 </br>
+			<legend>Playlist Description</legend>
+			<h5>Nom: <a href="#"><%=playlistname%></a> </h5>
+			<h5>Created at : <a href="#"><%=playlistcreate%></a><h5>
+		     </br>
+			
+
+
+		    
+	         <legend>Liste des tracks de la playliste</legend>
+			 
+				<div class="tracklist tab-pane" >
+                <ol class="tracks" >
+				
+			 <% _.each(tracklist, function(track) { 
+			        
+					
+					track_length=track.length;
+					track_source=track.source;
+					track_name=track.name;
+					track_id=track.track_id;
+					track_release=track.release;
+					track_artist=track.artist;
+					track_image=track.image;
+					track_index=i;
+					
+					i++;
+				
+					var minutes = Math.floor(track_length / 60);
+					
+				
+
+					var seconds = Math.floor((track_length) -  (minutes * 60));
+					
+					var track_info=new Array();
+					
+					track_info[0]=id_playlist;
+					track_info[1]=track_index;
+				
+					
+				
+					
+				%>
+					
+				   <li class="track" >
+				   <span class="title" ><%=track_name%></span>
+                   <span class="legth"><%=minutes%> : <%=seconds%></span>
+				   <span class="btn" title="Play" audiourl="<%=track_source%>" onclick="loadSong($(this))"><i class="icon-play-circle"></i> </span>
+				   <button class="btn remove" title="Remove from playlist" name="<%=track_info%>" ><i class=" icon-minus-sign"></i></button>
+				
+  
+				
+				   </li>
+                    
+				
+				
+				<% 
+					
+					}); 
+				
+				%>
+				</ol>
+				
+				
+				
+				
+				</div>
+				
+				
+				</div>
+				</div>
+				</div>
+				
+				
+				
+	  </script>
+
+	<!--playlist description!-->
+
+
+
+
+
+
+	<!--album!-->
+
+	<script type="text/template" id="result_album">
+
+	<div class="container">
+	   <div class="row-fluid">
+
+	        <div class="span12">
+			
+			<div class="span6">
+	 
+			<%
+			
+			
+			var tracklist=album.get("tracklist");
+			var albumname=album.get("name");
+			var albumid=album.get("id");
+			var albumstyle=album.get("styles");
+			var albumartist=album.get("artists");
+			var albumimage=album.get("image");
+			
+			var track_length;
+			var track_source;
+			var track_name;
+			var track_id;
+			var track_artist;
+			var track_release=albumname;
+			var track_image;
+			  
+			%>
+				
+	          
+
+			   
+			 
+			<legend>Album</legend>
+			
+			<table class="table table-striped table-bordered tab" id="datatable">
+	   
+	      <thead>
+			<tr>
+	           <th>Album</th>
+			   <th>Description</th>
+			</tr>
+				
+	      </thead>
+	         <tbody>
+			 <% 
+			   
+			   
+			 
+			 var img=albumimage.square ;
+			
+		             
+				 var im=_.toArray(img);
+				    
+					
+					   var url=im[2];
+					   track_image=url;
+					   
+					 %>
+						
+						
+			 
+			    <tr>
+			 
+				<td>
+		             
+					
+				 <img id="icons" style='float: left; padding-right: 2px; width: 85px; height: 85px;' border='0'src="<%=url%>" >
+				
+				</td> 
+				<td>
+				<p>
+				<div>Nom:<a href="#"><%=albumname%></a><div>
+				
+				
+				</p>
+				<p>
+				<div>Styles:
+				
+				<% _.each(albumstyle, function(style) { 
+				%>
+			    
+				<a href="#"><%=style.name%></a>&nbsp;&nbsp;
+				
+				<%}); %>
+				</div>
+				<p>
+				<div>Artists:
+				<% _.each(albumartist, function(artist) { 
+				
+				track_artist=artist.name;
+				
+				%>
+			
+				<a href="#"><%=artist.name%></a>
+				<%}); %>
+				</p>
+				</div>
+				<div style="text-align:right;" >
+				
+					<a class="btn " title="Add to favoris" href="#/album/<%= albumid %>"><i class="icon-heart icon-red" ></i></a>
+				</div>
+				
+	           	</td>
+				</tr>
+				
+				
+		
+				
+			
+				</tbody>
+				</table>
+				
+				</div>	        
+				</div>
+					</div>
+					</div>
+					
+					
+					
+					
+							
+				
+			
+				<div class="container">
+	   <div class="row-fluid">
+
+	        <div class="span12">
+				
+			<div class="span6">
+	         <legend>Liste des tracks</legend>
+			 
+				<div class="tracklist tab-pane" >
+                <ol class="tracks" >
+				
+			 <% _.each(tracklist, function(track) { 
+			     
+					track_length=track.length;
+					track_source=track.source;
+					track_name=track.name;
+					track_id=track.track_id;
+				
+					var minutes = Math.floor(track_length / 60);
+					
+				
+
+					var seconds = Math.floor((track_length) -  (minutes * 60));
+					
+					var track_array=new Array();
+					
+					track_array[0]=track_name;
+					track_array[1]=track_id;
+					track_array[2]=track_source;
+					track_array[3]=track_length;
+					track_array[4]=track_artist;
+					track_array[5]=track_release;
+					track_array[6]=track_image;
+					
+				
+					
+				%>
+					
+				   <li class="track" >
+				   <span class="title" ><%=track_name%></span>
+                   <span class="legth"><%=minutes%> : <%=seconds%></span>
+				   <span class="btn" title="Play" audiourl="<%=track_source%>" onclick="loadSong($(this))"><i class="icon-play-circle"></i> </span>
+				   <a href="#/addtrack" class="btn add" title="Add to playlist" name="<%=track_array%>" ><i class="icon-plus-sign"></i></a>
+				
+  
+				</ul></button>
+				   </li>
+                    
+				
+				
+				<% 
+					
+					}); 
+				
+				%>
+				</ol>
+				
+				
+				
+				
+				</div>
+				</div>
+				
+				<div class="span6">
+				<div id="addtrack">
+	 
+				</div>
+				</div>
+				
+				</div>
+				</div>
+				</div>
+				
+			
+				
+			
+			
+	   
+		
+		
+		
+		
+		
+	  
+
+
+					
+				
+	  </script>
+
+	<!--album!-->
+
+	<script type="text/javascript">
+
+		
+		var Releases = Backbone.Collection.extend({
+	      url: 'http://ihm-api.telecom-st-etienne.fr/releases'
+	    });
+		
+		var Playlists = Backbone.Collection.extend({
+	      url: 'http://ihm-api.telecom-st-etienne.fr/playlists'
+	    });
+		
+		
+	
+		
+		var HeaderView = Backbone.View.extend({
+			  el: $("#blog_header"),
+			  
+			events: {
+				//'click .invite': 'inviter',
+				//'click .modifier': 'modifier'
+				
+			  },
+			  
+
+
+			  
+			  render: function() {
+			  var that = this;
+			  
+			  var template = _.template($("#blog_header_template").html());
+	          that.$el.html(template);
+				
+			  },
+			});
+		
+	     var ReleaseView = Backbone.View.extend({
+	      el: '.releases',
+		  
+
+	      render: function (options) {
+		  	
+	        var that = this;
+	        var releases = new Releases();
+			var userid=$.cookie('userid');
+			
+			releases.credentials = {
+					username: userid,
+					password: 'x'
+											};
+	        releases.fetch({
+	          success: function (releases) {
+			    
+				
+	            var template = _.template($('#releases').html(), {releases: releases.models});
+	            that.$el.html(template);
+	          }
+	        })
+	      }
+	    });
+		
+		var AddTrackView = Backbone.View.extend({
+	    
+			  
+	      render: function () {
+		  
+		  var that = this;
+	        var playlists = new Playlists();
+			var userid=$.cookie('userid');
+			
+			playlists.credentials = {
+					username: userid,
+					password: 'x'
+											};
+	        playlists.fetch({
+	          success: function (playlists) {
+			    
+				
+	            var template = _.template($('#blog_addtrack_template').html(), {playlists: playlists.models});
+	            $( "#addtrack" ).html(template);
+	          }
+	        })
+	      }
+	    });
+		
+		
+		var PlaylistView = Backbone.View.extend({
+	      el: $("#blog_playlist"),
+		   
+			events: {
+				'click .btn-info': 'saveplaylist',
+				'click .btn-danger': 'removeplaylist'
+			  },
+			  
+		saveplaylist: function (ev) {
+		
+			var playlist_name = $(".create-playlist-form :input")
+			, that = this;
+			
+			var userid=$.cookie('userid');
+			$.ajax({
+			type:"POST",
+			url:"http://ihm-api.telecom-st-etienne.fr/playlists",
+			data : {name :playlist_name[0].value} ,
+			beforeSend: function(xhr) { xhr.setRequestHeader("Authorization", "Basic " + btoa(userid + ":" + 'x')); },
+			
+			dataType : 'json',
+			success:function (data) {
+			
+					
+			window.location.href="acceuil.html";
+					}
+				
+	});
+	},
+	
+	removeplaylist: function (ev) {
+		
+			
+			that = this;
+			var id=ev.currentTarget.name;
+			
+			var userid=$.cookie('userid');
+			$.ajax({
+			type:"DELETE",
+			url:"http://ihm-api.telecom-st-etienne.fr/playlists/"+id,
+			beforeSend: function(xhr) { xhr.setRequestHeader("Authorization", "Basic " + btoa(userid + ":" + 'x')); },
+			
+			dataType : 'json',
+			success:function (data) {
+			
+		
+			window.location.href="acceuil.html";
+			
+					}
+				
+	}); 
+	},
+			  
+	      render: function () {
+		  
+		  var that = this;
+	        var playlists = new Playlists();
+			var userid=$.cookie('userid');
+			
+			playlists.credentials = {
+					username: userid,
+					password: 'x'
+											};
+	        playlists.fetch({
+	          success: function (playlists) {
+			    
+				
+	            var template = _.template($('#blog_playlist_template').html(), {playlists: playlists.models});
+	            that.$el.html(template);
+	          }
+	        })
+	      }
+	    });
+				
+		var Favorites = Backbone.Collection.extend({
+      url: 'http://ihm-api.telecom-st-etienne.fr/favorites'
+    });
+
+    
+
+	
+	
+    var FavoriteView = Backbone.View.extend({
+      el:  $("#blog_favoris"),
+	  
+	  
+      render: function () {
+        var that = this;
+		
+        var favorites = new Favorites();
+		
+		var userid=$.cookie('userid');
+			
+			favorites.credentials = {
+					username: userid,
+					password: 'x'
+											};
+											
+        favorites.fetch({
+          success: function (favorites) {
+		    
+			
+            var template = _.template($('#favorite-list-template').html(), {favorites: favorites.models});
+            that.$el.html(template);
+          }
+        })
+      }
+    });
+	
+	
+	var DeletefavoriteView= Backbone.View.extend({
+	      
+	      render: function (options) {
+		  
+		 var ok = confirm("Are you sure you want to delete this release from favorites?");
+
+			if (ok)
+			{ 
+  
+			var userid=$.cookie('userid');
+			$.ajax({
+			type:"DELETE",
+			url:'http://ihm-api.telecom-st-etienne.fr/releases/' + options.id +'/favorite ',
+			beforeSend: function(xhr) { xhr.setRequestHeader("Authorization", "Basic " + btoa(userid + ":" + 'x')); },
+			dataType : 'json',
+			
+			error:function(err){ console.log(err); },
+			success:function (data) {
+			 
+			 var favoriteView=new FavoriteView();
+			
+			favoriteView.render();
+				
+				}
+	});
+	}
+		  
+	        
+	      }
+	    });
+	
+	
+		
+			
+		var MainView = Backbone.View.extend({
+		
+		
+		  render: function() {
+			
+			var headerView=new HeaderView();
+			var releaseView=new ReleaseView();
+			var playlistView=new PlaylistView ();
+			var favoriteView=new FavoriteView();
+			headerView.render();
+			releaseView.render();
+			playlistView.render(); 
+			favoriteView.render();
+			
+		  }
+		});
+
+	  
+	  var Album = Backbone.Model.extend({
+	      url: 'http://ihm-api.telecom-st-etienne.fr/releases'
+	    });
+		
+		var AlbumdecriptionView= Backbone.View.extend({
+	      
+		  
+		
+	      render: function (options) {
+	        var that = this;
+	        var album = new Album();
+	
+			
+			album.url = function() {
+			return 'http://ihm-api.telecom-st-etienne.fr/releases/' + options.id +'/favorite ';
+					};
+			
+			var userid=$.cookie('userid');
+			
+			
+			album.credentials = {
+					username: userid,
+					password: 'x'
+								};
+								
+			
+			album.save();
+			alert("Ajout d album aux favoris reussi");
+			
+           
+			
+				
+				
+	         
+	        
+	      }
+	    });
+		
+		var Playlist = Backbone.Model.extend({
+	      url: 'http://ihm-api.telecom-st-etienne.fr/playlists'
+	    });
+		
+		var PlaylistdescView= Backbone.View.extend({
+	      el: '.bodyy',
+		  
+		events: {
+				'click .remove': 'removetrack'
+				
+				
+			  },
+		removetrack: function (ev) {
+		
+			
+			var that = this;
+			var info=ev.currentTarget.name.split(',');
+			
+			var id_playlist=info[0];
+			var index=info[1];
+			var userid=$.cookie('userid');
+			$.ajax({
+			type:"DELETE",
+			url:"http://ihm-api.telecom-st-etienne.fr/playlists/"+id_playlist+"/tracks/"+index,
+			beforeSend: function(xhr) { xhr.setRequestHeader("Authorization", "Basic " + btoa(userid + ":" + 'x')); },
+			
+			dataType : 'json',
+			success:function (data) {
+			
+			var headerView=new HeaderView();	
+			var playlisdescView=new PlaylistdescView();
+			headerView.render();	
+			playlistdescView.render({id: id_playlist});
+			
+					}
+				
+	}); 
+	},
+		
+	      render: function (options) {
+	        var that = this;
+	        
+			var playlist = new Playlist();
+			var userid=$.cookie('userid');
+			
+			
+			playlist.url = function() {
+			return 'http://ihm-api.telecom-st-etienne.fr/playlists/' + options.id  ;
+					};
+					
+			playlist.credentials = {
+					username: userid,
+					password: 'x'
+											};
+	        playlist.fetch({
+	          success: function (playlist) {
+			    
+				
+	            var template = _.template($('#desc_playlist_template').html(), {playlist: playlist});
+	            that.$el.html(template);
+	          }
+	        })
+	      }
+		
+		
+	    });
+		
+		
+	   var AlbumView = Backbone.View.extend({
+	      el: '.bodyy',
+		  
+		events: {
+				'click .add': 'addtrack',
+				'click .btn-success': 'addtracktoplaylist'
+				
+			  },
+			  
+			  
+		addtracktoplaylist: function (ev) {
+		
+		
+			 var playlist_id = $("select[name='tracks'] > option:selected").val()
+			, that = this;
+			var track=$.cookie('track').split(',');
+			var track_name=track[0];
+			var track_id=track[1];
+			var track_source=track[2];
+			var track_length=track[3];
+			var track_artist=track[4];
+			var track_release=track[5];
+			var track_image=track[6];
+			//alert(track_name);
+			//alert(playlist_id);
+			var userid=$.cookie('userid');
+			var track_info={name :track_name,track_id:track_id,length:track_length,source:track_source,artist:track_artist,release:track_release,image:track_image};
+			$.ajax({
+			type:"POST",
+			url:"http://ihm-api.telecom-st-etienne.fr/playlists/"+playlist_id+"/tracks",
+			data : {tracks:{name :track_name,track_id:track_id,length:track_length,source:track_source,artist:track_artist,release:track_release,image:track_image}} ,
+			beforeSend: function(xhr) { xhr.setRequestHeader("Authorization", "Basic " + btoa(userid + ":" + 'x')); },
+			
+			dataType : 'json',
+			success:function (data) {
+			
+			
+			window.location.href="acceuil.html";
+					}
+				
+	});
+	},
+			  
+		addtrack: function (ev) {
+		
+			var track = ev.currentTarget.name;
+			
+			$.cookie('track',track);
+		
+	},
+	      render: function (options) {
+	        var that = this;
+	        var album = new Album();
+			
+			album.url = function() {
+			return 'http://ihm-api.telecom-st-etienne.fr/releases/' + options.id  ;
+					};
+			
+			var userid=$.cookie('userid');
+			
+			
+			album.credentials = {
+					username: userid,
+					password: 'x'
+								};
+			
+			
+	        album.fetch({
+	          success: function (album) {
+			    
+				
+	            var template = _.template($('#result_album').html(), {album: album});
+	            that.$el.html(template);
+	          }
+	        })
+	      }
+	    });
+	    var Router = Backbone.Router.extend({
+	        routes: {
+	          "": "acceuil",
+			  "releases/:id":"release",
+			  "album/:id":"album",
+			   "delete/:id":"delete",
+			   "addtrack":"addtrackto",
+			   "playlist/:id":"playlistdesc"
+			  }
+	    });
+		
+		var mainView =new MainView ();
+		var albumdecriptionView=new AlbumdecriptionView();
+		var albumView=new AlbumView();
+		var headerView=new HeaderView();
+		var deletefavoriteView=new DeletefavoriteView();
+		var addTrackView=new AddTrackView();
+		var playlistdescView=new PlaylistdescView();
+
+	    var router = new Router;
+		
+		 router.on('route:acceuil', function() {
+	      mainView.render();
+	    })
+		
+		router.on('route:addtrackto', function() {
+	      addTrackView.render();
+	    })
+		
+		router.on('route:playlistdesc', function(id) {
+		  headerView.render();	
+	      playlistdescView.render({id: id});
+	    })
+		
+		 router.on('route:release', function(id) {
+			
+		  headerView.render();	
+	      albumView.render({id: id});
+	    })
+		
+		router.on('route:album', function(id) {
+	      albumdecriptionView.render({id: id});
+	    })
+		
+	   router.on('route:delete', function(id) {
+      
+		  deletefavoriteView.render({id:id});
+		})
+	  
+	    Backbone.history.start();
+		
+		
+		
+
+	</script>
+
+
+</body>
+</html>

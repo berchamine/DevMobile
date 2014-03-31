@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+<title>RespZic</title>
+<!-- On ouvre la fenêtre à la largeur de l'écran -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Intégration du CSS Bootstrap -->
+<link href="bootstrap/css/bootstrap.css" rel="stylesheet" media="screen">
+<link href="bootstrap/css/style.css" rel="stylesheet" media="screen">
+<!-- Intégration du CSS responsive Bootstrap -->
+<link href="bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
+
+<link rel="stylesheet" href="css/audioplayer.css" />
+
+<script type="text/javascript" src="js/jquery-1.8.1.min.js"></script>
+<script type="text/javascript" src="js/jquery.cookie.js"></script>
+<script src="bootstrap/js/bootstrap.min.js"></script>
+
+<script src="backbone001/libs/vendors/underscore.js"></script>
+<script src="backbone001/libs/vendors/backbone.js"></script>
+<script src="backbone001/libs/vendors/backbone.basicauth.js"></script>
+
+<style type="text/css">
+body {
+	background-image: url('music.png');
+}
+
+#bienvenue {
+	color: #dd2929;
+	text-align: center;
+}
+</style>
+
+</head>
+
+
+<body>
+
+
+
+	<div class="container">
+		<div class="row">
+			<div class="span6 offset3">
+				<div class="modal-header">
+					<h3>Login</h3>
+				</div>
+				<div class="modal-body">
+					<div class="alert alert-error" style="display: none;"></div>
+
+					<div class="blog_login_form"></div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+	<script type="text/template" id="blog_login_form_template">
+					<div class="control-group">
+		<label class="control-label" for="inputEmail">Email</label>
+		<div class="controls">
+		  <input type="text" id="inputEmail" placeholder="Email">
+		</div>
+	  </div>
+	  <div class="control-group">
+		<label class="control-label" for="inputPassword">Password</label>
+		<div class="controls">
+		  <input type="password" id="inputPassword" placeholder="Password">
+		</div>
+	  </div>
+	  <div class="control-group">
+		<div class="controls">
+		  <button type="submit" class="btn btn-primary" id="loginButton">Sign in</button>
+		</div>
+	  </div>
+					
+				
+					
+				
+	</script>
+
+
+	<script>
+
+	window.LoginView = Backbone.View.extend({
+	el : '.blog_login_form',
+	initialize : function () {
+	var that = this;
+	var template = _.template($('#blog_login_form_template').html());
+				that.$el.html(template);
+
+	},
+
+	events : {
+	"click .btn-primary" : "onClickBtnLogin"
+	},
+
+	onClickBtnLogin : function (domEvent) {
+	//event.preventDefault(); // Don't let this button submit the form
+	$('.alert-error').hide(); // Hide any errors on a new submit
+	var fields = $(".blog_login_form :input")
+	, that = this;
+
+	$.ajax({
+	type:"POST",
+	url:"http://ihm-api.telecom-st-etienne.fr/sessions",
+	data : { email_address :fields[0].value, password : fields[1].value } ,
+	dataType : 'json',
+	error:function(err){ $('.alert-error').text("L'email ou le mot de passe que vous avez saisi est incorrect").show(); },
+	success:function (data) {
+					
+					
+				   
+					if(data.error) {  // If there is an error, show the error messages
+						$('.alert-error').text(data.error.text).show();
+					}
+					else { 
+						
+						$.cookie('userid', data.id);
+						$.cookie('username', data.name);
+						$.cookie('email', data.email_address);
+						$.cookie('level', data.level);
+					
+				        window.location.href="acceuil.html";
+					}
+				}
+	});
+	},
+
+
+	});
+	window.loginView = new LoginView();
+	</script>
+
+</body>
+</html>
